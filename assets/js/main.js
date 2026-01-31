@@ -59,15 +59,13 @@ function setupFormValidation() {
  * Validate individual input
  */
 function validateInput(input, showError = false) {
-    const value = parseFloat(input.value);
+    const value = Number.parseFloat(input.value);
     const isRequired = input.hasAttribute('required');
-    const min = parseFloat(input.getAttribute('min')) || 0;
+    const min = Number.parseFloat(input.getAttribute('min')) || 0;
     
     let isValid = true;
 
-    if (isRequired && (input.value === '' || isNaN(value))) {
-        isValid = false;
-    } else if (value < min) {
+    if ((isRequired && (input.value === '' || Number.isNaN(value))) || value < min) {
         isValid = false;
     }
 
@@ -75,13 +73,13 @@ function validateInput(input, showError = false) {
     if (showError && !isValid) {
         input.classList.add('is-invalid');
         input.classList.remove('is-valid');
-    } else if (input.value !== '') {
+    } else if (input.value === '') {
+        input.classList.remove('is-invalid', 'is-valid');
+    } else {
         input.classList.remove('is-invalid');
         if (isValid) {
             input.classList.add('is-valid');
         }
-    } else {
-        input.classList.remove('is-invalid', 'is-valid');
     }
 
     return isValid;
@@ -250,9 +248,9 @@ function animateNumbers() {
     
     numberElements.forEach(el => {
         const finalValue = el.textContent;
-        const numericValue = parseFloat(finalValue.replace(/[^\d.-]/g, ''));
+        const numericValue = Number.parseFloat(finalValue.replaceAll(/[^\d.-]/g, ''));
         
-        if (isNaN(numericValue)) return;
+        if (Number.isNaN(numericValue)) return;
 
         let startValue = 0;
         const duration = 800;
