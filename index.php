@@ -1,327 +1,320 @@
+<?php
+/**
+ * Electricity Consumption Calculator
+
+ * A modern, clean calculator for computing power, energy, and electricity costs.
+ * @author Qorish
+ * @version 1.0.0
+ */
+
+// Composer autoload
+require_once __DIR__ . '/vendor/autoload.php';
+
+use ElectricityCalculator\Validator;
+use ElectricityCalculator\Calculator;
+
+// Process form submission
+$data = Validator::processCalculation();
+$errors = $data['errors'];
+$results = $data['results'];
+$inputValues = $data['inputValues'];
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Calculate your electricity consumption, power usage, and costs with this easy-to-use calculator.">
     <title>Electricity Consumption Calculator</title>
-    <!-- Bootstrap 4 CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
-    <style>
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 40px 0;
-        }
-        .calculator-card {
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-        .card-header {
-            border-radius: 15px 15px 0 0 !important;
-            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
-        }
-        .result-box {
-            background-color: #f8f9fa;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
-        }
-        .result-item {
-            padding: 10px;
-            margin: 5px 0;
-            border-left: 4px solid #3498db;
-            background-color: #fff;
-        }
-        .btn-calculate {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            padding: 12px 40px;
-        }
-        .btn-calculate:hover {
-            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-        }
-    </style>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-
-<?php
-/**
- * Electricity Consumption Calculator
- * 
- * Calculates power, energy, and total charge based on:
- * - Power (Wh) = Voltage (V) * Current (A)
- * - Energy (kWh) = Power * Hours / 1000
- * - Total = Energy (kWh) * (rate/100)
- */
-
-/**
- * Calculate electricity consumption
- * 
- * @param float $voltage - Voltage in Volts (V)
- * @param float $current - Current in Amperes (A)
- * @param float $rate - Current rate per kWh
- * @param int $hours - Number of hours (default: 1 for hourly, 24 for daily)
- * @return array - Array containing power, energy, and total charge
- */
-function calculateElectricity($voltage, $current, $rate, $hours = 1) {
-    // Calculate Power in Watts (W) = Voltage * Current
-    $power = $voltage * $current;
-    
-    // Calculate Energy in kWh = Power * Hours / 1000
-    $energy = ($power * $hours) / 1000;
-    
-    // Calculate Total Charge = Energy * (rate/100)
-    $totalCharge = $energy * ($rate / 100);
-    
-    return [
-        'power' => $power,
-        'energy' => $energy,
-        'totalCharge' => $totalCharge
-    ];
-}
-
-/**
- * Calculate electricity rates per hour
- * 
- * @param float $voltage - Voltage in Volts (V)
- * @param float $current - Current in Amperes (A)
- * @param float $rate - Current rate per kWh
- * @return array - Hourly calculation results
- */
-function calculatePerHour($voltage, $current, $rate) {
-    return calculateElectricity($voltage, $current, $rate, 1);
-}
-
-/**
- * Calculate electricity rates per day (24 hours)
- * 
- * @param float $voltage - Voltage in Volts (V)
- * @param float $current - Current in Amperes (A)
- * @param float $rate - Current rate per kWh
- * @return array - Daily calculation results
- */
-function calculatePerDay($voltage, $current, $rate) {
-    return calculateElectricity($voltage, $current, $rate, 24);
-}
-
-// Initialize variables
-$voltage = $current = $rate = $customHours = '';
-$results = null;
-$errors = [];
-
-// Process form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Validate and sanitize inputs
-    $voltage = filter_input(INPUT_POST, 'voltage', FILTER_VALIDATE_FLOAT);
-    $current = filter_input(INPUT_POST, 'current', FILTER_VALIDATE_FLOAT);
-    $rate = filter_input(INPUT_POST, 'rate', FILTER_VALIDATE_FLOAT);
-    $customHours = filter_input(INPUT_POST, 'hours', FILTER_VALIDATE_INT);
-    
-    // Validation
-    if ($voltage === false || $voltage === null || $voltage <= 0) {
-        $errors[] = 'Please enter a valid positive voltage value.';
-    }
-    if ($current === false || $current === null || $current <= 0) {
-        $errors[] = 'Please enter a valid positive current value.';
-    }
-    if ($rate === false || $rate === null || $rate < 0) {
-        $errors[] = 'Please enter a valid rate value.';
-    }
-    if ($customHours === false || $customHours === null || $customHours <= 0) {
-        $customHours = 1; // Default to 1 hour
-    }
-    
-    // Calculate if no errors
-    if (empty($errors)) {
-        $results = [
-            'hourly' => calculatePerHour($voltage, $current, $rate),
-            'daily' => calculatePerDay($voltage, $current, $rate),
-            'custom' => calculateElectricity($voltage, $current, $rate, $customHours),
-            'customHours' => $customHours
-        ];
-    }
-}
-?>
-
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card calculator-card">
-                <div class="card-header text-white text-center py-4">
-                    <h2 class="mb-0">
-                        <i class="fas fa-bolt"></i> Electricity Consumption Calculator
-                    </h2>
-                    <p class="mb-0 mt-2">Calculate Power, Energy & Total Charge</p>
+    <main class="calculator-wrapper">
+        <article class="calculator-card">
+            <!-- Header Section -->
+            <header class="card-header">
+                <div class="header-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
                 </div>
-                
-                <div class="card-body p-4">
-                    <?php if (!empty($errors)): ?>
-                        <div class="alert alert-danger">
-                            <strong>Error!</strong>
-                            <ul class="mb-0">
-                                <?php foreach ($errors as $error): ?>
-                                    <li><?php echo htmlspecialchars($error); ?></li>
-                                <?php endforeach; ?>
+                <h1>Electricity Calculator</h1>
+                <p class="subtitle">Calculate Power, Energy & Total Charge</p>
+            </header>
+
+            <!-- Main Content -->
+            <div class="card-body">
+                <?php if (!empty($errors)): ?>
+                    <div class="alert alert-danger" role="alert">
+                        <strong>Please fix the following errors:</strong>
+                        <ul>
+                            <?php foreach ($errors as $error): ?>
+                                <li><?= htmlspecialchars($error) ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
+                <!-- Calculator Form -->
+                <form method="POST" action="" class="calculator-form" novalidate>
+                    <div class="input-grid">
+                        <!-- Voltage Input -->
+                        <div class="form-group">
+                            <label for="voltage" class="form-label">Voltage (V)</label>
+                            <input
+                                type="number"
+                                id="voltage"
+                                name="voltage"
+                                class="form-control"
+                                placeholder="e.g., 220"
+                                step="0.01"
+                                min="0"
+                                value="<?= htmlspecialchars($inputValues['voltage']) ?>"
+                                required
+                            >
+                            <span class="form-hint">Enter voltage in Volts</span>
+                        </div>
+
+                        <!-- Current Input -->
+                        <div class="form-group">
+                            <label for="current" class="form-label">Current (A)</label>
+                            <input
+                                type="number"
+                                id="current"
+                                name="current"
+                                class="form-control"
+                                placeholder="e.g., 5"
+                                step="0.01"
+                                min="0"
+                                value="<?= htmlspecialchars($inputValues['current']) ?>"
+                                required
+                            >
+                            <span class="form-hint">Enter current in Amperes</span>
+                        </div>
+
+                        <!-- Rate Input -->
+                        <div class="form-group">
+                            <label for="rate" class="form-label">Rate (sen/kWh)</label>
+                            <input
+                                type="number"
+                                id="rate"
+                                name="rate"
+                                class="form-control"
+                                placeholder="e.g., 120"
+                                step="0.01"
+                                min="0"
+                                value="<?= htmlspecialchars($inputValues['rate']) ?>"
+                                required
+                            >
+                            <span class="form-hint">Enter your electricity rate in sen per kWh</span>
+                        </div>
+
+                        <!-- Hours Input -->
+                        <div class="form-group">
+                            <label for="hours" class="form-label">Custom Hours</label>
+                            <input
+                                type="number"
+                                id="hours"
+                                name="hours"
+                                class="form-control"
+                                placeholder="e.g., 8"
+                                min="1"
+                                value="<?= htmlspecialchars($inputValues['hours'] ?: '1') ?>"
+                            >
+                            <span class="form-hint">Duration for custom calculation</span>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                            <span class="btn-text">Calculate</span>
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-reset">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            Reset
+                        </button>
+                    </div>
+                </form>
+
+                <?php if ($results): ?>
+                    <!-- Results Section -->
+                    <section class="results-section">
+                        <div class="results-header">
+                            <span class="results-badge">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Calculation Results
+                            </span>
+                            <?php if (isset($results['inputs']['rate']) && is_numeric($results['inputs']['rate'])): ?>
+                                <div style="margin-top:8px;font-size:0.95rem;color:var(--gray-600);">
+                                    RM Rate: <strong><?= number_format($results['inputs']['rate']/100, 2) ?> RM/kWh</strong>
+                                </div>
+                            <?php endif; ?>
+                            <?php if (isset($results['hourly']['power'])): ?>
+                                <div style="margin-top:4px;font-size:0.95rem;color:var(--gray-600);">
+                                    Power: <strong><?= number_format($results['hourly']['power'], 2) ?> W (<?= number_format($results['hourly']['power']/1000, 2) ?> kW)</strong>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="results-grid">
+                            <!-- Power Result -->
+                            <div class="result-card">
+                                <h3 class="result-title">
+                                    <span class="result-icon" style="display:inline-flex;align-items:center;justify-content:center;width:2.5em;height:2.5em;border-radius:50%;border:2px solid #e2e8f0;background:#fff;box-shadow:0 2px 8px rgba(99,102,241,0.08);margin-right:8px;overflow:hidden;">
+                                        <img src="assets/icon/electric-power.gif" alt="Power" style="width:100%;height:100%;object-fit:contain;" />
+                                    </span>
+                                    Power
+                                </h3>
+                                <div class="result-value"><?= Calculator::formatNumber($results['hourly']['power'], 2) ?> W</div>
+                                <p class="result-detail">Watts of power consumption</p>
+                                <p class="result-formula">
+                                    <?= $results['inputs']['voltage'] ?>V × <?= $results['inputs']['current'] ?>A = <?= Calculator::formatNumber($results['hourly']['power'], 2) ?>W
+                                </p>
+                            </div>
+
+                            <!-- Hourly Result -->
+                            <div class="result-card">
+                                <h3 class="result-title">
+                                    <span class="result-icon" style="display:inline-flex;align-items:center;justify-content:center;width:2.5em;height:2.5em;border-radius:50%;border:2px solid #e2e8f0;background:#fff;box-shadow:0 2px 8px rgba(99,102,241,0.08);margin-right:8px;overflow:hidden;">
+                                        <img src="assets/icon/1-hour.gif" alt="Per Hour" style="width:100%;height:100%;object-fit:contain;" />
+                                    </span>
+                                    Per Hour
+                                </h3>
+                                <div class="result-value"><?= Calculator::formatNumber($results['hourly']['energy'], 4) ?> kWh</div>
+                                <p class="result-detail">
+                                    Total Charge: <strong><?= Calculator::formatNumber($results['hourly']['totalCharge'], 2) ?></strong>
+                                </p>
+                            </div>
+
+                            <!-- Daily Result -->
+                            <div class="result-card">
+                                <h3 class="result-title">
+                                    <span class="result-icon" style="display:inline-flex;align-items:center;justify-content:center;width:2.5em;height:2.5em;border-radius:50%;border:2px solid #e2e8f0;background:#fff;box-shadow:0 2px 8px rgba(99,102,241,0.08);margin-right:8px;overflow:hidden;">
+                                        <img src="assets/icon/24-hour-service.gif" alt="Per Day (24h)" style="width:100%;height:100%;object-fit:contain;" />
+                                    </span>
+                                    Per Day (24h)
+                                </h3>
+                                <div class="result-value"><?= Calculator::formatNumber($results['daily']['energy'], 4) ?> kWh</div>
+                                <p class="result-detail">
+                                    Total Charge: <strong><?= Calculator::formatNumber($results['daily']['totalCharge'], 2) ?></strong>
+                                </p>
+                            </div>
+
+                            <!-- Custom Hours Result -->
+                            <div class="result-card">
+                                <h3 class="result-title">
+                                    <span class="result-icon" style="display:inline-flex;align-items:center;justify-content:center;width:2.5em;height:2.5em;border-radius:50%;border:2px solid #e2e8f0;background:#fff;box-shadow:0 2px 8px rgba(99,102,241,0.08);margin-right:8px;overflow:hidden;">
+                                        <img src="assets/icon/time.gif" alt="Custom Hours" style="width:100%;height:100%;object-fit:contain;" />
+                                    </span>
+                                    Custom (<?= $results['customHours'] ?>h)
+                                </h3>
+                                <div class="result-value"><?= Calculator::formatNumber($results['custom']['energy'], 4) ?> kWh</div>
+                                <p class="result-detail">
+                                    Total Charge: <strong><?= Calculator::formatNumber($results['custom']['totalCharge'], 2) ?></strong>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Formula Reference -->
+                        <div class="formula-box">
+                            <h3>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Formulas Used
+                            </h3>
+                            <ul class="formula-list">
+                                <li>Power (W) = Voltage (V) × Current (A)</li>
+                                <li>Energy (kWh) = Power × Hours ÷ 1000</li>
+                                <li>Total Charge = Energy (kWh) × (Rate ÷ 100)</li>
                             </ul>
                         </div>
-                    <?php endif; ?>
-                    
-                    <form method="POST" action="">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="voltage">
-                                        <strong>Voltage (V)</strong>
-                                    </label>
-                                    <input type="number" 
-                                           class="form-control form-control-lg" 
-                                           id="voltage" 
-                                           name="voltage" 
-                                           placeholder="e.g., 220"
-                                           step="0.01"
-                                           value="<?php echo htmlspecialchars($_POST['voltage'] ?? ''); ?>"
-                                           required>
-                                    <small class="form-text text-muted">Enter voltage in Volts</small>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="current">
-                                        <strong>Current (A)</strong>
-                                    </label>
-                                    <input type="number" 
-                                           class="form-control form-control-lg" 
-                                           id="current" 
-                                           name="current" 
-                                           placeholder="e.g., 5"
-                                           step="0.01"
-                                           value="<?php echo htmlspecialchars($_POST['current'] ?? ''); ?>"
-                                           required>
-                                    <small class="form-text text-muted">Enter current in Amperes</small>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="rate">
-                                        <strong>Rate per kWh</strong>
-                                    </label>
-                                    <input type="number" 
-                                           class="form-control form-control-lg" 
-                                           id="rate" 
-                                           name="rate" 
-                                           placeholder="e.g., 12"
-                                           step="0.01"
-                                           value="<?php echo htmlspecialchars($_POST['rate'] ?? ''); ?>"
-                                           required>
-                                    <small class="form-text text-muted">Enter electricity rate</small>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="hours">
-                                        <strong>Custom Hours</strong>
-                                    </label>
-                                    <input type="number" 
-                                           class="form-control form-control-lg" 
-                                           id="hours" 
-                                           name="hours" 
-                                           placeholder="e.g., 8"
-                                           min="1"
-                                           value="<?php echo htmlspecialchars($_POST['hours'] ?? '1'); ?>">
-                                    <small class="form-text text-muted">Hours for custom calculation</small>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="text-center mt-4">
-                            <button type="submit" class="btn btn-primary btn-calculate btn-lg">
-                                Calculate
-                            </button>
-                            <button type="reset" class="btn btn-secondary btn-lg ml-2">
-                                Reset
+                        <div style="text-align:center;margin-top:32px;">
+                            <button id="show-breakdown" class="btn btn-breakdown" type="button">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span>Show 24-Hour Breakdown</span>
                             </button>
                         </div>
-                    </form>
-                    
-                    <?php if ($results): ?>
-                        <div class="result-box">
-                            <h4 class="text-center mb-4">
-                                <span class="badge badge-success">Calculation Results</span>
-                            </h4>
-                            
-                            <!-- Power Result -->
-                            <div class="result-item">
-                                <h5>⚡ Power</h5>
-                                <p class="mb-0">
-                                    <strong><?php echo number_format($results['hourly']['power'], 2); ?> Watts (W)</strong>
-                                    <br>
-                                    <small class="text-muted">
-                                        Formula: Power = Voltage × Current = 
-                                        <?php echo $voltage; ?>V × <?php echo $current; ?>A
-                                    </small>
-                                </p>
-                            </div>
-                            
-                            <!-- Hourly Results -->
-                            <div class="result-item">
-                                <h5>🕐 Per Hour (1 Hour)</h5>
-                                <p class="mb-0">
-                                    Energy: <strong><?php echo number_format($results['hourly']['energy'], 4); ?> kWh</strong>
-                                    <br>
-                                    Total Charge: <strong><?php echo number_format($results['hourly']['totalCharge'], 2); ?></strong>
-                                </p>
-                            </div>
-                            
-                            <!-- Daily Results -->
-                            <div class="result-item">
-                                <h5>📅 Per Day (24 Hours)</h5>
-                                <p class="mb-0">
-                                    Energy: <strong><?php echo number_format($results['daily']['energy'], 4); ?> kWh</strong>
-                                    <br>
-                                    Total Charge: <strong><?php echo number_format($results['daily']['totalCharge'], 2); ?></strong>
-                                </p>
-                            </div>
-                            
-                            <!-- Custom Hours Results -->
-                            <div class="result-item">
-                                <h5>⏱️ Custom (<?php echo $results['customHours']; ?> Hours)</h5>
-                                <p class="mb-0">
-                                    Energy: <strong><?php echo number_format($results['custom']['energy'], 4); ?> kWh</strong>
-                                    <br>
-                                    Total Charge: <strong><?php echo number_format($results['custom']['totalCharge'], 2); ?></strong>
-                                </p>
-                            </div>
-                            
-                            <!-- Formulas Used -->
-                            <div class="alert alert-info mt-4">
-                                <h6><strong>Formulas Used:</strong></h6>
-                                <ul class="mb-0">
-                                    <li>Power (W) = Voltage (V) × Current (A)</li>
-                                    <li>Energy (kWh) = Power × Hours ÷ 1000</li>
-                                    <li>Total Charge = Energy (kWh) × (Rate ÷ 100)</li>
-                                </ul>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-                </div>
-                
-                <div class="card-footer text-center text-muted">
-                    <small>Electricity Consumption Calculator &copy; <?php echo date('Y'); ?></small>
-                </div>
+                        <div id="breakdown-table-container" style="display:none;margin-top:24px;"></div>
+                    </section>
+                <?php endif; ?>
             </div>
-        </div>
-    </div>
-</div>
 
-<!-- Bootstrap 4 JS and dependencies -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"></script>
+            <!-- Footer -->
+            <footer class="card-footer">
+                <p class="footer-text">
+                    Electricity Consumption Calculator &copy; <?= date('Y') ?>
+                </p>
+            </footer>
+        </article>
+    </main>
 
+    <!-- JavaScript -->
+    <script src="assets/js/main.js"></script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.getElementById('show-breakdown');
+    if (btn) {
+        btn.addEventListener('click', function() {
+            const container = document.getElementById('breakdown-table-container');
+            if (!container) return;
+            if (container.innerHTML.trim() === '') {
+                <?php
+                // PHP: Generate 24-hour breakdown data as a JS array
+                $hourlyRows = [];
+                $valid = isset($results['hourly']['power'], $results['inputs']['rate']) && is_numeric($results['hourly']['power']) && is_numeric($results['inputs']['rate']);
+                for ($h = 1; $h <= 24; $h++) {
+                    if ($valid) {
+                        $energy = $results['hourly']['power'] * $h / 1000;
+                        $charge = $energy * ($results['inputs']['rate'] / 100);
+                        $hourlyRows[] = [
+                            'hour' => $h,
+                            'energy' => number_format($energy, 4),
+                            'charge' => number_format($charge, 2)
+                        ];
+                    } else {
+                        $hourlyRows[] = [
+                            'hour' => $h,
+                            'energy' => 'Invalid parameter',
+                            'charge' => 'Invalid parameter'
+                        ];
+                    }
+                }
+                ?>
+                const breakdownData = <?php echo json_encode($hourlyRows); ?>;
+                let html = '<table class="breakdown-table">';
+                html += '<thead><tr><th>Hour</th><th>Energy (kWh)</th><th>Charge (RM)</th></tr></thead><tbody>';
+                breakdownData.forEach(row => {
+                    html += `<tr><td>${row.hour}h</td><td>${row.energy}</td><td>RM ${row.charge}</td></tr>`;
+                });
+                html += '</tbody></table>';
+                container.innerHTML = html;
+            }
+            container.style.display = container.style.display === 'none' ? 'block' : 'none';
+            const spanText = btn.querySelector('span');
+            if (spanText) {
+                spanText.textContent = container.style.display === 'none' ? 'Show 24-Hour Breakdown' : 'Hide 24-Hour Breakdown';
+            }
+        });
+    }
+});
+    </script>
 </body>
 </html>

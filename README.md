@@ -1,50 +1,83 @@
-# Electricity Consumption Calculator
+# ⚡ Electricity Consumption Calculator
 
-A simple PHP application to calculate power, energy, and total electricity charge based on user inputs.
+A modern, responsive PHP application for calculating power consumption, energy usage, and electricity costs.
 
-## Features
+## ✨ Features
 
-- Calculate **Power** in Watts (W)
-- Calculate **Energy** in kilowatt-hours (kWh)
-- Calculate **Total Charge** based on the current rate
-- Results displayed for:
-  - Per Hour (1 hour)
-  - Per Day (24 hours)
-  - Custom hours (user-defined)
-- Responsive design using **Bootstrap 4**
-- Input validation and error handling
+- **Power Calculation** — Compute wattage from voltage and current inputs
+- **Energy Consumption** — Calculate kilowatt-hours (kWh) for any time period
+- **Cost Estimation** — Estimate electricity charges based on your rate
+- **Multiple Time Periods** — View results for hourly, daily, and custom durations
+- **Modern UI** — Clean, responsive design with smooth animations
+- **Real-time Validation** — Instant input feedback with visual indicators
+- **No Dependencies** — Pure CSS and vanilla JavaScript (no Bootstrap or jQuery)
 
-## Formulas Used
+## 📁 Project Structure
 
-| Calculation | Formula |
-|-------------|---------|
-| Power (W) | Voltage (V) × Current (A) |
-| Energy (kWh) | Power × Hours ÷ 1000 |
-| Total Charge | Energy (kWh) × (Rate ÷ 100) |
+```
+electricity-calculator/
+├── index.php                 # Main application entry point
+├── composer.json             # Composer dependencies & autoloading
+├── README.md                 # Project documentation
+├── assets/
+│   ├── css/
+│   │   └── style.css        # Main stylesheet (modern, responsive)
+│   └── js/
+│       └── main.js          # Interactive functionality
+├── src/                      # PSR-4 autoloaded classes
+│   ├── Calculator.php       # Core calculation logic
+│   └── Validator.php        # Input validation & processing
+└── vendor/                   # Composer dependencies (auto-generated)
+```
 
-## Requirements
+## 🧮 Formulas Used
 
-- PHP 7.0 or higher
-- Web server (Apache, Nginx, or PHP built-in server)
+| Calculation   | Formula                           |
+|---------------|-----------------------------------|
+| Power (W)     | Voltage (V) × Current (A)         |
+| Energy (kWh)  | Power × Hours ÷ 1000              |
+| Total Charge  | Energy (kWh) × (Rate ÷ 100)       |
 
-## Installation
+## 📋 Requirements
 
-1. Clone the repository:
+- PHP 7.4 or higher
+- Composer (for dependency management)
+- Web server (Apache, Nginx, XAMPP, or PHP built-in server)
+
+## 🚀 Installation
+
+1. **Clone the repository:**
    ```bash
    git clone https://github.com/yourusername/electricity-calculator.git
    ```
 
-2. Navigate to the project directory:
+2. **Navigate to the project directory:**
    ```bash
    cd electricity-calculator
    ```
 
-3. Start a local PHP server:
+3. **Install dependencies:**
+   ```bash
+   composer install
+   ```
+   
+   Or if Composer isn't installed globally:
+   ```bash
+   php composer.phar install
+   ```
+
+4. **Start a local PHP server:**
    ```bash
    php -S localhost:8000
    ```
+   
+   Or if using XAMPP:
+   ```bash
+   # Add PHP to PATH or use full path
+   C:\xampp\php\php.exe -S localhost:8000
+   ```
 
-4. Open your browser and go to:
+4. **Open your browser:**
    ```
    http://localhost:8000
    ```
