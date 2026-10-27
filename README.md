@@ -12,7 +12,7 @@ Everything is calculated in the browser. There is no server, database, account o
 ## Get started
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Qorish/electricity-calculator.git
 cd electricity-calculator
 npm install
 npm run dev
@@ -45,8 +45,7 @@ Example: 230 V × 5 A at 50 sen/kWh is 1,150 W. That is 1.15 kWh and RM 0.575 pe
 | Command | What it does |
 | --- | --- |
 | `npm run dev` | Start the dev server with hot reload |
-| `npm run build` | Create the production build |
-| `npm start` | Serve the production build (run `build` first) |
+| `npm run build` | Create the production build; the static site is written to `out/` |
 | `npm test` | Run the unit and component tests |
 | `npm run test:watch` | Re-run tests on change |
 | `npm run lint` | Check code style |
@@ -84,9 +83,11 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for how the pieces fit together.
 - **"Invalid value" messages:** voltage and current must be above 0, rate must be 0 or more, and hours must be a whole number of 1 or more.
 - **Stale styles or odd errors after pulling changes:** stop the server, delete the `.next` folder and run `npm install` and `npm run dev` again.
 
-## Deploying
+## Live site and deploying
 
-It is a standard Next.js app with no environment variables. Push it to a Git host and import it into [Vercel](https://vercel.com) or Netlify, or run `npm run build && npm start` on any machine with Node.js.
+The site is published free on GitHub Pages at <https://qorish.github.io/electricity-calculator/>. Every push to `main` runs type check, lint, tests and the build, then redeploys automatically (about 2 minutes). Check progress under the repository's **Actions** tab.
+
+It is a static export with no environment variables, so it also works on Netlify, Vercel or any static host. If you move it, change `basePath` in `next.config.ts` (or remove it for a root domain).
 
 ## License
 
