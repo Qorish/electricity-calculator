@@ -87,3 +87,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for how the pieces fit together.
 ## Deploying
 
 It is a standard Next.js app with no environment variables. Push it to a Git host and import it into [Vercel](https://vercel.com) or Netlify, or run `npm run build && npm start` on any machine with Node.js.
+
+## License
+
+[MIT](LICENSE) © 2026 Qorish
