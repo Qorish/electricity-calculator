@@ -1,34 +1,14 @@
-# Git ignore file
+node_modules
+.next
+coverage
+.env*
+!.env.example
+next-env.d.ts
+*.tsbuildinfo
+.vercel
 
-# Composer
-/vendor/
-composer.phar
-composer.lock
+# Design and browser tool scratch (screenshots, logs)
+.hallmark/
+.taste-skill/
+.playwright-mcp/
 
-# IDE files
-.idea/
-.vscode/
-*.sublime-project
-*.sublime-workspace
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Logs
-*.log
-logs/
-
-# Temporary files
-*.tmp
-*.swp
-*~
-
-# Environment files
-.env
-.env.local
-.env.*.local
-
-# Vendor files (if using composer)
-/vendor/
-composer.lock
