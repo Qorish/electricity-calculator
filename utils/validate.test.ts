@@ -13,6 +13,8 @@ test.each([
   [{ current: "-2" }, 1],
   [{ rate: "-1" }, 1],
   [{ hours: "1.5" }, 1],
+  [{ voltage: "1e999" }, 1],
+  [{ hours: "1e999" }, 1],
   [{ voltage: "", current: "", rate: "" }, 3],
 ])("rejects %j", (patch, count) => {
   const r = validate({ ...ok, ...patch });

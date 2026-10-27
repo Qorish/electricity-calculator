@@ -1,15 +1,16 @@
 import "./globals.css";
-import { Inter } from "next/font/google";
+import { Albert_Sans, Geist_Mono } from "next/font/google";
 import { site } from "@/data/site";
 
-const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
+const albert = Albert_Sans({ subsets: ["latin"], weight: ["400", "600"], variable: "--font-albert", display: "swap" });
+const geistMono = Geist_Mono({ subsets: ["latin"], weight: ["400"], variable: "--font-geist-mono", display: "swap" });
 
-export const metadata = { title: site.name, description: site.description };
+export const metadata = { title: site.title, description: site.description };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
+    <html lang="en" className={`${albert.variable} ${geistMono.variable}`}>
+      <body>{children}</body>
     </html>
   );
 }

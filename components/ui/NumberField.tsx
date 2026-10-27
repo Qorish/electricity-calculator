@@ -1,19 +1,24 @@
 import { cn } from "@/utils/cn";
 
-type Props = React.InputHTMLAttributes<HTMLInputElement> & { label: string; hint: string };
+type Props = React.InputHTMLAttributes<HTMLInputElement> & { label: string; hint: string; id: string };
 
-export function NumberField({ label, hint, id, className, ...props }: Props) {
+export function NumberField({ label, hint, id, className, ...props }: Readonly<Props>) {
   return (
-    <div className="flex flex-col gap-1">
-      <label htmlFor={id} className="text-sm font-semibold text-slate-700">{label}</label>
+    <div className="field flex flex-col gap-2">
+      <label htmlFor={id} className="field-label text-sm font-semibold text-ink-2">
+        {label}
+      </label>
       <input
         id={id}
         type="number"
         inputMode="decimal"
-        className={cn("rounded-xl border-2 border-slate-200 px-4 py-3 outline-none focus:border-indigo-500", className)}
+        aria-describedby={`${id}-hint`}
+        className={cn("field-input h-12 px-4 text-base", className)}
         {...props}
       />
-      <span className="text-xs text-slate-500">{hint}</span>
+      <span id={`${id}-hint`} className="text-sm text-muted">
+        {hint}
+      </span>
     </div>
   );
 }

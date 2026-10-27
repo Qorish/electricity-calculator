@@ -2,13 +2,17 @@ import type { CalculatorInput, FormValues } from "@/types/calculator";
 
 export type Validation = { input: CalculatorInput | null; errors: string[] };
 
-const num = (v: string) => (v.trim() === "" ? NaN : Number(v));
+// Number("1e999") is Infinity, which passes `> 0` and would print as "∞"; treat it as invalid.
+const num = (v: string) => {
+  const n = v.trim() === "" ? NaN : Number(v);
+  return Number.isFinite(n) ? n : NaN;
+};
 
 export function validate(values: FormValues): Validation {
   const voltage = num(values.voltage);
   const current = num(values.current);
   const rate = num(values.rate);
-  const hours = values.hours.trim() === "" ? 1 : Number(values.hours);
+  const hours = values.hours.trim() === "" ? 1 : num(values.hours);
 
   const errors: string[] = [];
   if (!(voltage > 0)) errors.push("Please enter a valid positive voltage value.");

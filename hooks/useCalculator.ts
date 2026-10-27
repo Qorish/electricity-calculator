@@ -9,6 +9,7 @@ export function useCalculator() {
   const [values, setValues] = useState<FormValues>(empty);
   const [errors, setErrors] = useState<string[]>([]);
   const [result, setResult] = useState<CalculationResult | null>(null);
+  const [run, setRun] = useState(0);
 
   const setField = (name: keyof FormValues, value: string) => setValues((v) => ({ ...v, [name]: value }));
 
@@ -16,6 +17,7 @@ export function useCalculator() {
     const { input, errors } = validate(values);
     setErrors(errors);
     setResult(input ? calculate(input) : null);
+    if (input) setRun((n) => n + 1);
   };
 
   const reset = () => {
@@ -24,5 +26,5 @@ export function useCalculator() {
     setResult(null);
   };
 
-  return { values, errors, result, setField, submit, reset };
+  return { values, errors, result, run, setField, submit, reset };
 }
