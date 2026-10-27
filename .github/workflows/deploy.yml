@@ -24,10 +24,11 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # build first: it generates next-env.d.ts, which typecheck needs for the .gif imports
+      - run: npm run build
       - run: npm run typecheck
       - run: npm run lint
       - run: npm test
-      - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:
           path: out
